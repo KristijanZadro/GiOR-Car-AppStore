@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CarAppStore.Models;
 using CarAppStore.data;
+using CarAppStore.Services;
 
 namespace CarAppStore.Controllers
 {
@@ -14,34 +15,40 @@ namespace CarAppStore.Controllers
     [ApiController]
     public class CarsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public CarsController(AppDbContext context)
+        private readonly ICarsService _carsService;
+        public CarsController(ICarsService carsService)
         {
-            _context = context;
+            _carsService = carsService;
         }
 
         // GET: api/Cars
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Car>>> GetCars()
+        public async Task<ActionResult> GetCars()
         {
-            return await _context.Cars.ToListAsync();
+            return Ok(await _carsService.GetCars());
         }
 
         // GET: api/Cars/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Car>> GetCar(int id)
+        public async Task<ActionResult> GetCar(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
-
-            if (car == null)
+            var response = await _carsService.GetCar(id);
+            if (response == null)
             {
                 return NotFound();
             }
-
-            return car;
+            return Ok(response);
         }
 
+        // DELETE: api/Cars/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCar(int id)
+        {
+            await _carsService.DeleteCar(id);
+            return NoContent();
+        }
+
+        /*
         // PUT: api/Cars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -104,5 +111,6 @@ namespace CarAppStore.Controllers
         {
             return _context.Cars.Any(e => e.Id == id);
         }
+    */
     }
 }

@@ -15,5 +15,6 @@ namespace CarAppStore.data
             }
 
         public DbSet<Car> Cars { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
